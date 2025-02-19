@@ -163,11 +163,11 @@
 </div>
 </div>
    <div id="tools">
-    <div id="titems"> <img src="./thumbs-up_1f44d.webp" ></div>
-    <div id="titems1"></div>
-    <div id="titems2"></div>
-    <div id="titems3"></div>
-    <div id="titems4"></div>
+    <div id="titems"> <img id="webp1" src="./thumbs-up_1f44d.webp" ></div>
+    <div id="titems1"><img id="webp2" src="./thumbs-up_1f44d.webp" ></div>
+    <div id="titems2"><img id="webp3" src="./thumbs-up_1f44d.webp" ></div>
+    <div id="titems3"><img id="webp4" src="./thumbs-up_1f44d.webp" ></div>
+    <div id="titems4"><img id="webp5" src="./thumbs-up_1f44d.webp" ></div>
 </div>
 </div>
             <div class="cards">
@@ -596,7 +596,11 @@ function clearNotification(direction) {
       const titems2 = document.getElementById('titems2');
       const titems3 = document.getElementById('titems3');
       const titems4 = document.getElementById('titems4');
-      
+      const titems5 = document.getElementById('webp1');
+      const titems6 = document.getElementById('webp2');
+      const titems7 = document.getElementById('webp3');
+      const titems8 = document.getElementById('webp4');
+      const titems9 = document.getElementById('webp5');
   let isPressed = false;
   let timeoutId;
 
@@ -611,6 +615,12 @@ function clearNotification(direction) {
    titems2.classList.add('titems');
    titems3.classList.add('titems');
    titems4.classList.add('titems');
+   titems5.classList.add('titems');
+   titems6.classList.add('titems');
+   titems7.classList.add('titems');
+   titems8.classList.add('titems');
+   titems9.classList.add('titems');
+      
    
       // Highlight after 5 seconds
       // ... do something 
