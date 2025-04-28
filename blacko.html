@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoakUp - African Studies Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #eef2f7;
+            margin: 0;
+            padding: 0px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            width: 95%;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #1a202c;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            width: 100%;
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background: #48bb78;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .timer {
+            text-align: right;
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+        .question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        .options label {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f7fafc;
+            margin: 8px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .options label:hover {
+            background: #edf2f7;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        input[type="radio"] {
+            margin-right: 12px;
+            accent-color: #3182ce;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+        button:disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #prev {
+            background: #718096;
+            color: #fff;
+        }
+        #prev:hover:not(:disabled) {
+            background: #5a6270;
+        }
+        #next {
+            background: #3182ce;
+            color: #fff;
+        }
+        #next:hover:not(:disabled) {
+            background: #2b6cb0;
+        }
+        #submit {
+            background: #e53e3e;
+            color: #fff;
+        }
+        #submit:hover:not(:disabled) {
+            background: #c53030;
+        }
+        #result {
+            margin-top: 30px;
+            font-size: 3px; /* Corrected from 3px to 18px */
+            color: #2d3748;
+        }
+        .result-header {
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+        .review-table {
+            width: 100%; /* Corrected from 100px to 100% */
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin: auto;
+        }
+        .review-table th, .review-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            word-wrap: break-word;
+            max-width: 200px; /* Added to prevent overflow */
+        }
+        .review-table th {
+            background: #edf2f7;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        .correct {
+            color: #48bb78;
+            font-weight: 500;
+        }
+        .incorrect {
+            color: #e53e3e;
+            font-weight: 500;
+        }
+        .correct-answer {
+            color: #48bb78;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Communication skills (communication)</h1>
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+        <div class="timer">Time: <span id="time">00:00</span></div>
+        <div id="quiz"></div>
+        <div class="buttons">
+            <button id="prev" disabled>Previous</button>
+            <button id="submit">Submit</button>
+            <button id="next">Next</button>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+       
+   const quizData = [
+    // Written Communication
+    { question: "During a conversation, you notice that the listener is distracted, looking at their phone. What is the most appropriate way to improve the situation?", options: ["Speak louder to get their attention", "Ignore the distraction and continue talking", "Pause and ask if they are following or need clarification", "Stop speaking and leave the conversation"], answer: "c" },
+    { question: "You are reading a chapter in a textbook to prepare for an exam. Which of the following strategies will help you understand the material more effectively?", options: ["Skim through the headings and subheadings to get an overview before reading in detail", "Read the entire chapter word for word without taking notes", "Skip sections you don’t understand and focus only on what you know", "Read the material once, then move on to another topic immediately"], answer: "a" },
+    { question: "You are reading an academic article and need to find a specific piece of data. Which technique should you use to locate it quickly?", options: ["Skim through the abstract for key words", "Read the entire article carefully from start to finish", "Scan for the specific figure or table reference in the article", "Skip over any technical details and focus only on conclusions"], answer: "c" },
+    { question: "While reading a passage, you notice a key argument being presented. To critically analyze it, which of the following would be the best approach?", options: ["Accept the argument without question", "Look for any counter-arguments or weaknesses in the reasoning", "Ignore the details and focus only on the author’s tone", "Take the argument at face value and use it as a fact in your own work"], answer: "b" },
+    { question: "You are reading a complex academic article and encounter unfamiliar terms. What is the best course of action?", options: ["Ignore the unfamiliar terms and keep reading", "Skip the difficult sections entirely", "Look up the unfamiliar terms and ask for clarification if needed", "Assume you understand the meaning based on context"], answer: "c" },
+    { question: "When reading a lengthy passage for comprehension, which technique will help you retain the information better?", options: ["Reading through it quickly without taking notes", "Taking notes and summarizing the key points as you read", "Rereading the entire passage without focusing on specific details", "Skipping sections that seem too complicated"], answer: "b" },
+    { question: "In the sentence “She brought cake, cookies, and ice cream,” which punctuation mark is correctly used to separate the list of items?", options: ["COLON", "SEMICOLON", "COMMA"], answer: "c" },
+    // Note: Questions 8-10 in the extracted list were incomplete (lacking options), so they are skipped here to match the structure of the original quizData.
+    { question: "WHEN READING A STATEMENT LIKE “I WILL MEET YOU AT THE BANK,” HOW CAN YOU CLARIFY THE AMBIGUITY IN THIS SENTENCE?", options: ["ASK FOR CLARIFICATION ABOUT WHICH TYPE OF “BANK” IS BEING REFERRED TO", "ASSUME IT IS A FINANCIAL INSTITUTION", "PROCEED WITHOUT ASKING, AS IT’S NOT IMPORTANT", "CHANGE THEWORD “BANK” TO SOMETHING MORE SPECIFIC"], answer: "a" },
+    { question: "WHICH SENTENCE DEMONSTRATES CORRECT.Subject-VERB AGREEMENT?", options: ["The students was excited about the trip.", "The team were happy to win the game.", "The team is excited about the trip.", "Neither the teacher nor the students was ready."], answer: "c" },
+    { question: "WHICH OF THE FOLLOWING SENTENCES CORRECTLY USES PRONOUN-ANTECEDENT AGREEMENT?", options: ["Every student must bring their textbook.", "Each student must bring his or her textbook.", "Every student must bring his or her textbook.", "Both students must bring their textbooks."], answer: "c" },
+    { question: "WHICH SENTENCE CONTAINS A.Subject-VERB AGREEMENT ERROR?", options: ["The teacher explains the lesson every day.", "The students are listening attentively.", "Neither the teacher nor the students is late.", "The dog chase the ball."], answer: "d" },
+    { question: "WHEN A COLLECTIVE NOUN LIKE “FAMILY” IS USED AS THE.Subject OF A SENTENCE, THE VERB SHOULD TYPICALLY BE:", options: ["PLURAL", "SINGULAR", "BOTH SINGULAR AND PLURAL", "NEITHER SINGULAR NOR PLURAL"], answer: "b" },
+    { question: "WHICH SENTENCE DEMONSTRATES THE CORRECT USE OF CONCORD?", options: ["Neither the student nor the teacher were absent.", "Neither the student nor the teacher was absent.", "Neither the students nor the teacher was absent.", "Neither the students nor the teacher were absent."], answer: "b" },
+    { question: "WHICH SENTENCE IS AN EXAMPLE OF AN IMPERATIVE SENTENCE?", options: ["“Close the door behind you.”", "“I love reading books.”", "“Can you close the door?”", "“What a beautiful day!”"], answer: "a" },
+    { question: "WHICH OF THE FOLLOWING SENTENCES IS AN EXCLAMATORY SENTENCE?", options: ["“I need a new phone!”", "“That was amazing!”", "“Can you believe it?”", "“Please pass the salt.”"], answer: "b" },
+    { question: "WHICH SENTENCE IS AN INTERROGATIVE SENTENCE?", options: ["“Please give me your attention.”", "“How are you feeling today?”", "“She enjoys playing soccer.”", "“The concert was amazing!”"], answer: "b" },
+    { question: "WHICH OF THE FOLLOWING IS A COMPOUND SENTENCE?", options: ["“She likes reading, but he prefers sports.”", "“He runs every morning.”", "“I cannot go to the park.”", "“I will stay home if it rains.”"], answer: "a" },
+    { question: "WHICH OF THE FOLLOWING IS A COMPLEX SENTENCE?", options: ["“She went to the store, and I stayed home.”", "“Although I was tired, I finished my homework.”", "“I like reading, and she likes writing.”", "“We can go out later if it stops raining.”"], answer: "b" },
+    { question: "KOFI CHEATS ON HIS WIFE. ______ HE.SUBJECTS HER TO DOMESTIC VIOLENCE.", options: ["NEVERTHELESS", "ALTHOUGH", "CONSEQUENTLY", "MOREOVER", "IN SPITE OF"], answer: "c" },
+    { question: "THE BLACK STARS ARE NOT AT THEIR PEAK. ______ THEY WILL WIN THE WORLD CUP.", options: ["NEVERTHELESS", "ALTHOUGH", "CONSEQUENTLY", "MOREOVER", "IN SPITE OF"], answer: "a" },
+    { question: "JOHN TRAILED THE BIOLOGY PAPER. ______ HE WON’T ENTER THE MEDICAL SCHOOL.", options: ["NEVERTHELESS", "ALTHOUGH", "CONSEQUENTLY", "MOREOVER", "IN SPITE OF"], answer: "c" },
+    { question: "______ HE IS NOT KNOWN TO BE RASH, HE SPOKE TO HIS FRIEND HARSHLY.", options: ["NEVERTHELESS", "ALTHOUGH", "CONSEQUENTLY", "MOREOVER", "IN SPITE OF"], answer: "b" },
+    { question: "MESSI WAS CROWNED THE GOAL KING AT THE WORLD CUP, ______ HIS LEGS BEING BOWLEGGED.", options: ["NEVERTHELESS", "ALTHOUGH", "CONSEQUENTLY", "MOREOVER", "IN SPITE OF"], answer: "e" },
+    { question: "a. The driver sped fast towards the armed robber intending to kill him. b. The driver sped fast towards the armed robber with his intention of killing him. c. Intending to kill him, the driver sped fast towards the armed robber.", options: ["a", "b", "c"], answer: "c" },
+    { question: "a. The Child hid the toy he found under his bed. b. The child who found the toy under his bed hid it. c. The child found the toy that was hidden under his bed.", options: ["a", "b", "c"], answer: "a" },
+    { question: "a. Running towards the main street, the bus hit the dog. b. The bus hit the dog that was running towards the main street. c. After running towards the main street, the car hit the dog.", options: ["a", "b", "c"], answer: "b" },
+    { question: "a. The leaders asked the congregation to fast for a week. b. The leaders informed the congregation they would have to fast for a week. c. The congregation was informed by their leaders they would have to fast for a week.", options: ["a", "b", "c"], answer: "b" },
+    { question: "a. When the Black Stars players go on leave from their trainers they often look very happy. b. When the Black Star players are granted leave by their trainers they often look vey happy. c. The Black Stars players are often very happy when they are granted leave by their trainers.", options: ["a", "b", "c"], answer: "c" },
+    { question: "WHAT IS THE PRIMARY REASON BEHIND THE SHIFT IN POLITICAL LEADERSHIP ACROSS AFRICA?", options: ["The frustration with the current parties", "The influence of international organizations", "The rising popularity of older leaders", "The desire for economic reforms"], answer: "a" },
+    { question: "WHICH OF THE FOLLOWING IS NOT MENTIONED AS A CONCERN DRIVING THE YOUTH’S DESIRE FOR POLITICAL CHANGE?", options: ["High unemployment", "Poverty", "Environmental issues", "Inadequate education"], answer: "c" },
+    { question: "WHAT ROLE DID YOUTH PLAY IN THE POLITICAL CAMPAIGNS IN COUNTRIES LIKE KENYA AND GHANA?", options: ["They actively criticized political leaders", "They were key supporters of political candidates", "They focused on educational reform", "They were largely uninterested in the political process"], answer: "b" },
+    { question: "WHO IS MENTIONED AS AN EXAMPLE OF A CANDIDATE WHO APPEALS TO THE YOUTH IN GHANA?", options: ["Raila Odinga", "John Dumelo", "Nelson Mandela", "Kwame Nkrumah"], answer: "b" },
+    { question: "WHAT IS ONE OF THE ARGUMENTS CRITICS RAISE ABOUT YOUNG POLITICAL LEADERS?", options: ["They are too dynamic and energetic", "They lack experience and wisdom", "They focus too much on international issues", "They have too much support from international organizations"], answer: "b" },
+    { question: "ACCORDING TO THE PASSAGE, HOW DO YOUNG LEADERS DIFFER FROM THE OLDER GENERATION OF POLITICIANS?", options: ["They are more focused on global issues", "They are less interested in public support", "They offer fresh ideas and energy", "They prefer to maintain the status quo"], answer: "c" },
+    { question: "WHAT CHALLENGE IS HIGHLIGHTED REGARDING THE YOUTH’S INVOLVEMENT IN POLITICS?", options: ["Lack of public support", "Inability to connect with older generations", "Lack of experience and political wisdom", "They are too focused on economic issues"], answer: "c" },
+    { question: "WHAT DOES THE PASSAGE SUGGEST IS THE POTIAL OUTCOME OF THE INCREASING INVOLVEMENT OF YOUTH IN POLITICS?", options: ["A continuation of political systems by older generations", "A shift in political power towards younger leaders", "A focus on cultural issues rather than politics", "A decline in political participation"], answer: "b" },
+    { question: "WHICH COUNTRY IS MENTIONED WITH RAILA ODINGA’S LEADERSHIP?", options: ["Nigeria", "Ghana", "Kenya", "South Africa"], answer: "c" },
+    { question: "ACCORDING TO THE PASSAGE, WHAT IS THE ROLE OF OLDER LEADERS IN AFRICA’S POLITICAL FUTURE?", options: ["They are expected to continue supporting change and progress", "They are emerging as uninvolved in politics rather than leadership positions", "They are largely focused on economic roles", "They prefer to focus on environmental issues"], answer: "a" },
+    { question: "WHICH OF THE FOLLOWING IS THE CLOSEST SYNONYM TO “FRUSTRATION” AS USED IN THE PASSAGE?", options: ["Satisfaction", "Annoyance", "Hopefulness", "Disappointment"], answer: "d" },
+    { question: "THE WORD “DISILLUSIONED” IN THE PASSAGE IS BEST REPLACED WITH WHICH OF THE FOLLOWING?", options: ["Confused", "Disappointed", "Excited", "Hopeful"], answer: "b" },
+    { question: "IN THE CONTEXT OF THE PASSAGE, WHICH OF THE FOLLOWING WORDS IS CLOSEST IN MEANING TO “DYNAMIC”?", options: ["Stagnant", "Energetic", "Dull", "Rigid"], answer: "b" },
+    { question: "WHICH OF THE FOLLOWING BEST DESCRIBES THE WORD “ENTHUSIASM” IN THE PASSAGE?", options: ["Indifference", "Excitement", "Disinterest", "Concern"], answer: "b" },
+    { question: "IN THE PASSAGE, THE WORD “CHALLENGES” IS CLOSEST IN MEANING TO:", options: ["Opportunities", "Difficulties", "Excuses", "Rewards"], answer: "b" },
+    { question: "WHICH OF THE FOLLOWING SENTENCES DEMONSTRATES CORRECT USE OF A SEMICOLON?", options: ["“I like to study; and I also enjoy reading.”", "“I like to study, and I also enjoy reading.”", "“I like to study, I also enjoy reading.”", "“I like to study. I also enjoy reading.”"], answer: "b" },
+    { question: "IN A FORMAL EMAIL TO YOUR LECTURER, WHICH PUNCTUATION MARK WOULD YOU USE TO INTRODUCE A LIST OF POINTS?", options: ["Period", "Comma", "Colon", "Exclamation mark"], answer: "c" },
+    { question: "WHICH OF THE FOLLOWING SENTENCES USES QUOTATION MARKS CORRECTLY?", options: ["He said “I will be back in 5 minutes.”", "“I will be back “in 5 minutes,”” he said.", "I will be back “in 5 minutes,” he said.", "He said, I will be back in 5 minutes."], answer: "a" },
+    { question: "WHICH OF THE FOLLOWING SENTENCES USES AN APOSTROPHE CORRECTLY?", options: ["The teams’ game was postponed.", "The team’s game was postponed.", "The teams game was postponed.", "The team’s’ game was postponed."], answer: "b" },
+    { question: "WHICH OF THE FOLLOWING STATEMENTS IS THE BEST WAY TO RESOLVE AMBIGUITY WHEN GIVING INSTRUCTIONS?", options: ["Use vague phrases that can be interpreted in different ways", "Provide specific and clear details on what is expected", "Assume the listener understands what you mean", "Leave out important information to save time"], answer: "b" },
+    { question: "IN THE SENTENCE “SHE SAW THE MAN WITH THE TELESCOPE,” WHAT IS THE SOURCE OF AMBIGUITY?", options: ["It’s unclear whether “she” or “the man” has the telescope", "The sentence is clear and unambiguous", "It’s unclear who “she” is", "It’s unclear whether “she” is inside or outside"], answer: "a" },
+    { question: "TO AVOID AMBIGUITY IN A REPORT, YOU SHOULD:", options: ["Use complex sentences to sound professional", "Use simple, clear language and explain technical terms", "Assume the reader will understand your jargon", "Use as few words as possible to keep it concise"], answer: "b" },
+    { question: "WHICH OF THE FOLLOWING TECHNIQUES CAN HELP RESOLVE AMBIGUITY IN ACADEMIC WRITING?", options: ["Providing definitions and context for specialized terms"], answer: "a" },
+    // Note: Question 55 is a comprehension task requiring a written summary, which does not fit the multiple-choice format of quizData, so it is skipped.
+    { question: "What is the primary reason behind the shift in political leadership across Africa?", options: ["The frustration with the current parties", "The influence of international organizations", "The rising popularity of older leaders", "The desire for economic reforms"], answer: "a" },
+    { question: "Which of the following is NOT mentioned as a concern driving the youth’s desire for political change?", options: ["High unemployment", "Poverty", "Environmental issues", "Inadequate education"], answer: "c" },
+    { question: "What role did young people play in the political campaigns in countries like Kenya and Ghana?", options: ["They actively criticized political leaders", "They were key supporters of political candidates", "They focused on educational reform", "They were largely uninterested in the political process"], answer: "b" },
+    { question: "Who is mentioned as an example of a candidate who appeals to the youth in Ghana?", options: ["Raila Odinga", "John Dumelo", "Nelson Mandela", "Kwame Nkrumah"], answer: "b" },
+    { question: "What is one of the arguments critics raise about young political leaders?", options: ["They are too dynamic and energetic", "They lack experience and wisdom", "They focus too much on international issues", "They have too much support from international organizations"], answer: "b" }
+];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let time = 0;
+        let timerInterval;
+
+        const quizContainer = document.getElementById("quiz");
+        const prevButton = document.getElementById("prev");
+        const nextButton = document.getElementById("next");
+        const submitButton = document.getElementById("submit");
+        const resultDiv = document.getElementById("result");
+        const progress = document.querySelector(".progress");
+        const timeDisplay = document.getElementById("time");
+
+        // Airtable Configuration
+        const airtableBaseId = "appBA8BDAjCnEwbEb"; // Replace with your Airtable Base ID (e.g., "appXXXXXXXXXXXXXX")
+        const airtableTableName = "Quiz table";
+        const airtablePAT = "patcwZljMJW2c5hsB.4de15ac60a7791f322ba80c5a5fbb9135ac8c2663765c5e7073419f724eb31fe"; // Replace with your PAT (e.g., "patXXXXXXXXXXXXXX")
+
+        // Start Timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                time++;
+                let minutes = Math.floor(time / 60);
+                let seconds = time % 60;
+                timeDisplay.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+            }, 1000);
+        }
+
+        // Load Question
+        function loadQuestion() {
+            const q = quizData[currentQuestion];
+            quizContainer.innerHTML = `
+                <div class="question">${currentQuestion + 1}. ${q.question}</div>
+                <div class="options">
+                    ${q.options.map((option, index) => `
+                        <label>
+                            <input type="radio" name="q${currentQuestion}" value="${String.fromCharCode(97 + index)}" ${userAnswers[currentQuestion] === String.fromCharCode(97 + index) ? "checked" : ""}>
+                            ${option}
+                        </label>
+                    `).join("")}
+                </div>
+            `;
+            updateProgress();
+            prevButton.disabled = currentQuestion === 0;
+            nextButton.disabled = currentQuestion === quizData.length - 1;
+        }
+
+        // Update Progress Bar
+        function updateProgress() {
+            const percentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progress.style.width = `${percentage}%`;
+        }
+
+        // Save Answer
+        function saveAnswer() {
+            const selected = document.querySelector(`input[name="q${currentQuestion}"]:checked`);
+            userAnswers[currentQuestion] = selected ? selected.value : null;
+        }
+
+        // Show Result with Improved Review
+        function showResult() {
+            clearInterval(timerInterval);
+            score = 0;
+            quizData.forEach((q, index) => {
+                if (userAnswers[index] === q.answer) score++;
+            });
+            quizContainer.innerHTML = "";
+            resultDiv.innerHTML = `
+                <div class="result-header">
+                    You scored ${score} out of ${quizData.length} (${Math.round((score / quizData.length) * 100)}%) in ${timeDisplay.textContent}
+                </div>
+                <table class="review-table">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Your Answer</th>
+                            <th>Correct Answer</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${quizData.map((q, i) => `
+                            <tr>
+                                <td>${i + 1}. ${q.question}</td>
+                                <td>${userAnswers[i] ? q.options[userAnswers[i].charCodeAt(0) - 97] : "Not answered"}</td>
+                                <td>${q.options[q.answer.charCodeAt(0) - 97]}</td>
+                                <td class="${userAnswers[i] === q.answer ? 'correct' : 'incorrect'}">
+                                    ${userAnswers[i] === q.answer ? "Correct" : "Incorrect"}
+                                </td>
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            `;
+            saveToServer();
+            prevButton.style.display = "none";
+            nextButton.style.display = "none";
+            submitButton.style.display = "none";
+        }
+
+        // Save Results to Airtable
+        function saveToServer() {
+            const data = {
+                fields: {
+                    UserID: "user123", // Replace with dynamic user ID logic if available
+                    QuizName: "African Studies Quiz",
+                    Score: score,
+                    Total: quizData.length,
+                    Time: time,
+                    Answers: JSON.stringify(userAnswers),
+                    Date: new Date().toISOString()
+                }
+            };
+
+            fetch(`https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${airtablePAT}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then(() => {
+                resultDiv.innerHTML += "<br><span class='correct'>Results saved successfully to Airtable!</span>";
+                console.log("Data saved to Airtable:", data);
+            })
+            .catch(error => {
+                resultDiv.innerHTML += "<br><span class='incorrect'>Error saving results to Airtable: " + error.message + "</span>";
+                console.error("Error saving to Airtable:", error);
+            });
+        }
+
+        // Event Listeners
+        prevButton.addEventListener("click", () => {
+            saveAnswer();
+            currentQuestion--;
+            loadQuestion();
+        });
+
+        nextButton.addEventListener("click", () => {
+            saveAnswer();
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            }
+        });
+
+        submitButton.addEventListener("click", () => {
+            saveAnswer();
+            showResult();
+        });
+
+        // Initialize Quiz
+        startTimer();
+        loadQuestion();
+    </script>
+</body>
+</html>
