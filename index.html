@@ -1,57 +1,30 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-        <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J1MSS6Y5W3"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J1MSS6Y5W3');
-</script>
+    <!-- Google tag (gtag.js) - Already present -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J1MSS6Y5W3"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-J1MSS6Y5W3');
+    </script>
     <meta charset="UTF-8">
+    <!-- SEO Meta Tags -->
+    <script src="https://kit.fontawesome.com/147d0f4a96.js" crossorigin="anonymous"></script>
+    <meta name="description" content="EduLink - Explore educational resources and tools to enhance your learning journey in communication skills and IT proficiency.">
+    <meta name="keywords" content="communication skills, IT proficiency, educational resources, comskills quiz, learning tools, edulink tray">
+    <meta name="author" content="Engineering">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduLink Tray</title>
+    <!-- Open Graph Tags for Social Sharing -->
+    <meta property="og:title" content="EduLink Tray - Communication Skills & Learning Resources">
+    <meta property="og:description" content="Explore educational resources and quizzes to enhance your communication skills and IT proficiency on EduLink Tray!">
+    <meta property="og:image" content="https://your-site-url/conseng.jpeg">
+    <meta property="og:url" content="https://your-site-url/index.html">
+    <meta property="og:type" content="website">
+    <!-- Suggest Browser Caching -->
+    <meta http-equiv="Cache-Control" content="max-age=31536000">
+    <title>EduLink Tray - Communication Skills & Learning Resources</title>
     <style>
         * {
             margin: 0;
@@ -137,6 +110,17 @@
             margin-right: 15px;
         }
 
+        /* Style Font Awesome Icons */
+        .link-icon.fa {
+            font-size: 24px;
+            color: #333; /* Default color */
+            transition: color 0.3s ease;
+        }
+
+        .link-button:hover .link-icon.fa {
+            color: #fff; /* Match hover text color */
+        }
+
         .tooltip {
             position: absolute;
             right: 15px;
@@ -151,6 +135,65 @@
 
         .link-button:hover .tooltip {
             opacity: 1;
+        }
+
+        /* Social Share Buttons Styling */
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .share-buttons a {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .share-buttons a:hover {
+            background-color: #0056b3;
+        }
+
+        /* Subscription Form Styling */
+        .subscribe-form {
+            margin-top: 20px;
+        }
+
+        .subscribe-form label {
+            display: block;
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .subscribe-form input[type="email"] {
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .subscribe-form button {
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #6e8efb, #a777e3);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .subscribe-form button:hover {
+            transform: translateY(-2px);
         }
 
         .footer {
@@ -182,35 +225,89 @@
         <p class="bio">Explore educational resources and tools to enhance your learning journey!</p>
         <div class="link-list">
             <a href="ICT.html" class="link-button" target="_blank">
-                <img src="https://img.icons8.com/color/24/000000/school.png" alt="Khan Academy Icon" class="link-icon">
+                <i class="fas fa-laptop-code link-icon"></i>
                 PROFICIENCY IN I.T 
                 <span class="tooltip">Learn past questions of your lecturers</span>
             </a>
             <a href="comskills1.html" class="link-button" target="_blank">
-                <img src="https://i.ibb.co/Xr1dryFH/icons8-study-40.png" alt="Coursera Icon" class="link-icon">
+                <i class="fas fa-question-circle link-icon"></i>
                 COMSKILLS QUIZ 1
                 <span class="tooltip">Learn from top universities</span>
             </a>
             <a href="comskills2.html" class="link-button" target="_blank">
-                <img src="https://img.icons8.com/color/24/000000/code.png" alt="Codecademy Icon" class="link-icon">
+                <i class="fas fa-question-circle link-icon"></i>
                 COMSKILLS QUIZ 2
                 <span class="tooltip">Enhance your knowledge</span>
             </a>
             <a href="comskills3.html" class="link-button" target="_blank">
-                <img src="https://img.icons8.com/color/24/000000/language.png" alt="Duolingo Icon" class="link-icon">
-               COMSKILLS QUIZ 3
+                <i class="fas fa-question-circle link-icon"></i>
+                COMSKILLS QUIZ 3
                 <span class="tooltip">Fun language learning</span>
             </a>
             <a href="blacko.html" class="link-button" target="_blank">
-                <img src="https://img.icons8.com/color/24/000000/graduation-cap.png" alt="edX Icon" class="link-icon">
-                END OF SEMISTER EXAM
+                <i class="fas fa-graduation-cap link-icon"></i>
+                END OF SEMESTER EXAM
                 <span class="tooltip">Professional WAY OF STUDYING</span>
             </a>
+        </div>
+        <!-- Social Share Buttons -->
+        <div class="share-buttons">
+            <a href="https://twitter.com/intent/tweet?url=https://your-site-url/index.html&text=Check out EduLinks for communication skills and IT resources!" target="_blank"><i class="fa-brands fa-xl fa-square-x-twitter"></i></a>
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://your-site-url/index.html" target="_blank"><i class="fa-brands fa-linkedin fa-xl"></i></a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://your-site-url/index.html" target="_blank"><i class="fa-brands fa-square-facebook fa-xl"></i></a>
+        </div>
+        <!-- Subscription Form -->
+        <div class="subscribe-form">
+            <form action="https://formspree.io/f/meogenoe" method="POST">
+                <label for="email">Subscribe for Updates:</label>
+                <input type="email" name="email" id="email" placeholder="Enter your email" required>
+                <button type="submit">Subscribe</button>
+            </form>
         </div>
         <p class="footer">© 2025 Comskills. Keep learning, keep growing!</p>
     </div>
 
-    <script>
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+
+        // Existing JavaScript for link buttons
         document.querySelectorAll('.link-button').forEach(button => {
             button.addEventListener('click', (e) => {
                 const url = button.getAttribute('href');
@@ -224,5 +321,6 @@
             });
         });
     </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9388e37829a6c01f',t:'MTc0NjAzNTUwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
