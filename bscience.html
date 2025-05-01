@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoakUp - African Studies Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #eef2f7;
+            margin: 0;
+            padding: 0px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            width: 95%;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #1a202c;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            width: 100%;
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background: #48bb78;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .timer {
+            text-align: right;
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+        .question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        .options label {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f7fafc;
+            margin: 8px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .options label:hover {
+            background: #edf2f7;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        input[type="radio"] {
+            margin-right: 12px;
+            accent-color: #3182ce;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+        button:disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #prev {
+            background: #718096;
+            color: #fff;
+        }
+        #prev:hover:not(:disabled) {
+            background: #5a6270;
+        }
+        #next {
+            background: #3182ce;
+            color: #fff;
+        }
+        #next:hover:not(:disabled) {
+            background: #2b6cb0;
+        }
+        #submit {
+            background: #e53e3e;
+            color: #fff;
+        }
+        #submit:hover:not(:disabled) {
+            background: #c53030;
+        }
+        #result {
+            margin-top: 30px;
+            font-size: 3px; /* Corrected from 3px to 18px */
+            color: #2d3748;
+        }
+        .result-header {
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+        .review-table {
+            width: 100%; /* Corrected from 100px to 100% */
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin: auto;
+        }
+        .review-table th, .review-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            word-wrap: break-word;
+            max-width: 200px; /* Added to prevent overflow */
+        }
+        .review-table th {
+            background: #edf2f7;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        .correct {
+            color: #48bb78;
+            font-weight: 500;
+        }
+        .incorrect {
+            color: #e53e3e;
+            font-weight: 500;
+        }
+        .correct-answer {
+            color: #48bb78;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BUILDINGS SCIENCE</h1>
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+        <div class="timer">Time: <span id="time">00:00</span></div>
+        <div id="quiz"></div>
+        <div class="buttons">
+            <button id="prev" disabled>Previous</button>
+            <button id="submit">Submit</button>
+            <button id="next">Next</button>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+       
+         const quizData = [
+    { question: "What factor does NOT directly influence the pressure rise due to water hammer in a pipe system?", options: ["The velocity of the pressure wave", "The diameter of the pipe", "The time taken to close the valve", "The length of the pipe"], answer: "b" },
+    { question: "In the context of valve closure for water hammer, what condition indicates a sudden closure?", options: ["T > 2L/C", "T < 2L/C", "T = 2L/C", "T ≥ 2L/C"], answer: "b" },
+    { question: "Which of the following best describes open channel flow?", options: ["Flow in a fully enclosed pipe under pressure", "Flow where the liquid surface is exposed to the atmosphere", "Flow in a sealed tank with no air exposure", "Flow in a pipe with a constant pressure gradient"], answer: "b" },
+    { question: "Which type of fluid flow is characterized by fluid particles moving in a zig-zag pattern with high energy loss?", options: ["Laminar flow", "Steady flow", "Turbulent flow", "Uniform flow"], answer: "c" },
+    { question: "What distinguishes incompressible flow from compressible flow?", options: ["Incompressible flow has varying density, while compressible flow does not", "Incompressible flow has constant density, while compressible flow has varying density", "Incompressible flow occurs in gases, while compressible flow occurs in liquids", "Incompressible flow involves rotation, while compressible flow does not"], answer: "b" },
+    { question: "What is the primary cause of major energy losses in pipes?", options: ["Sudden enlargement of the pipe", "Friction within the pipe", "Obstructions in the pipe", "Bends in the pipe"], answer: "b" },
+    { question: "In the Darcy-Weisbach formula for head loss, what does the variable 'f' represent?", options: ["Length of the pipe", "Acceleration due to gravity", "Coefficient of friction", "Mean velocity of flow"], answer: "c" },
+    { question: "Using the Darcy-Weisbach formula, if the length of a pipe doubles, how does the head loss due to friction change?", options: ["It halves", "It doubles", "It remains unchanged", "It quadruples"], answer: "b" },
+    { question: "In Chezy's formula, what does the variable 'm' represent?", options: ["Chezy's constant", "Hydraulic mean depth", "Loss of head per unit length", "Mean velocity of flow"], answer: "b" },
+    { question: "For a pipe with a diameter of 0.3 m, what is the hydraulic mean depth (m) according to Chezy's formula?", options: ["0.075 m", "0.15 m", "0.3 m", "0.6 m"], answer: "a" },
+    { question: "What is the head loss due to friction in a pipe using the Darcy-Weisbach formula if f=0.00256, L=50 m, V=3 m/s, d=0.3 m, and g=9.81 m/s²?", options: ["0.1959 m", "1.665 m", "0.0333 m", "0.0024 m"], answer: "a" },
+    { question: "In the Chezy's formula problem from the slides, what is the value of 'i' (loss of head per unit length) for V=3 m/s, C=60, and m=0.075 m?", options: ["0.1959", "0.0333", "1.665", "0.0024"], answer: "b" },
+    { question: "What type of energy loss in pipes is considered minor and can often be neglected in long pipes?", options: ["Loss due to friction", "Loss due to sudden enlargement", "Loss due to pipe fittings", "Loss due to pipe diameter"], answer: "b" },
+    { question: "Which of the following is NOT a cause of minor energy losses in pipes?", options: ["Sudden contraction", "Friction along the pipe length", "Bends in the pipe", "Obstructions in the pipe"], answer: "b" },
+    { question: "What is a primary use of a contractor's pump on a construction site?", options: ["To increase the groundwater table", "To dewater waterlogged areas", "To heat the construction site", "To seal cofferdams permanently"], answer: "b" },
+    { question: "Which condition must a contractor's pump endure during operation?", options: ["Constant temperature with no variation", "Handling only clean, non-corrosive water", "Severe conditions like handling muddy or corrosive water", "Operation without any variation in pumping head"], answer: "c" },
+    { question: "What flow rate is considered suitable for a contractor's pump for home use?", options: ["50-100 liters per minute", "100-200 liters per minute", "200-300 liters per minute", "300-400 liters per minute"], answer: "b" },
+    { question: "What happens if you attempt to pump water to a height greater than the maximum head of a contractor's pump?", options: ["The flow rate increases", "The flow rate becomes zero", "The pump operates normally", "The pump's efficiency increases"], answer: "b" },
+    { question: "Which type of pump is preferred for pumping sewage due to its ability to handle suspended matter?", options: ["Diaphragm pump", "Reciprocating pump", "Centrifugal pump", "Submersible dewatering pump"], answer: "c" },
+    { question: "What should be considered about the power supply when selecting a contractor's pump?", options: ["The pump should always use a manual crank", "A high-speed centrifugal pump is preferred for direct coupling to a motor", "The pump should only use solar power", "The power supply does not affect pump selection"], answer: "b" },
+    { question: "How does the consistency of use affect a contractor's pump?", options: ["Intermittent use reduces corrosion issues", "Continuous use increases corrosion troubles", "Intermittent use increases corrosion troubles", "Consistency of use has no impact on the pump"], answer: "c" },
+    { question: "Which factor is critical in the functional requirements of a pump lift?", options: ["The color of the pump", "Variation of the suction head", "The weight of the pump", "The material of the pump's casing"], answer: "b" },
+    { question: "What principle does a diaphragm pump operate on?", options: ["Centrifugal force", "Air displacement", "Gravitational pull", "Magnetic induction"], answer: "b" },
+    { question: "During the induction stroke of a diaphragm pump, what happens to the discharge valve?", options: ["It opens to release water", "It remains closed due to a vacuum", "It oscillates rapidly", "It closes to prevent backflow"], answer: "b" },
+    { question: "What happens to the intake valve during the discharge stroke of a diaphragm pump?", options: ["It opens to allow water in", "It remains closed as a one-way valve", "It vibrates to increase pressure", "It opens to release air"], answer: "b" },
+    { question: "How can the pumping capacity of a diaphragm pump be increased?", options: ["By reducing the size of the diaphragm", "By adding a second diaphragm", "By decreasing the suction stroke", "By using a smaller air chamber"], answer: "b" },
+    { question: "What energy source is NOT mentioned as a possible driver for a diaphragm pump?", options: ["Electric motor", "Diesel motor", "Solar power", "Air motor"], answer: "c" },
+    { question: "What component in a reciprocating pump is responsible for creating suction during the reverse stroke?", options: ["Delivery valve", "Piston movement", "Air chamber", "Casing"], answer: "b" },
+    { question: "What must be done before starting a centrifugal pump to ensure proper operation?", options: ["Priming to remove air from the system", "Closing the suction pipe", "Opening the delivery valve fully", "Reducing the impeller speed"], answer: "a" },
+    { question: "What role does the impeller play in a centrifugal pump?", options: ["It converts pressure energy into kinetic energy", "It increases the velocity of the liquid radially outward", "It reduces the pressure of the liquid", "It seals the casing to prevent leaks"], answer: "b" },
+    { question: "What happens at the 'eye' of the impeller in a centrifugal pump during operation?", options: ["A high-pressure zone is created", "A partial vacuum is created", "The liquid velocity decreases", "The liquid is discharged outward"], answer: "b" },
+    { question: "Which advantage does a reciprocating pump have over a centrifugal pump?", options: ["It can handle liquids with solids in suspension", "It can be designed for higher heads", "It delivers liquid without pressure", "It is simpler and cheaper"], answer: "b" },
+    { question: "What is an advantage of a centrifugal pump over a reciprocating pump?", options: ["It operates at a constant efficiency over a wide range of flow rates", "It can handle liquids with large amounts of solids in suspension", "It is not subject to air binding", "It is more flexible in operation"], answer: "b" },
+    { question: "Why might a centrifugal pump be preferred over a reciprocating pump in terms of installation?", options: ["It requires gears or belts for motor connection", "It can be directly connected to a motor without gears", "It cannot handle pressure variations", "It requires more maintenance"], answer: "b" },
+    { question: "What is the primary purpose of sound absorbers in a room?", options: ["To amplify sound waves", "To reduce reverberation and echo", "To increase noise levels", "To reflect sound waves uniformly"], answer: "b" },
+    { question: "Which material is NOT typically used as a sound absorber?", options: ["Foam", "Fiberglass", "Painted concrete", "Mineral wool"], answer: "c" },
+    { question: "Where are sound absorbers commonly used to improve sound quality?", options: ["Outdoor parks", "Recording studios", "Industrial warehouses", "Open fields"], answer: "b" },
+    { question: "How do porous absorbers reduce sound energy?", options: ["By reflecting sound waves back into the room", "By converting sound energy into heat through friction", "By amplifying the sound waves", "By blocking sound waves completely"], answer: "b" },
+    { question: "What can negatively affect the performance of a porous absorber?", options: ["Using a natural finish", "Covering it with paint or a plastic membrane", "Increasing the pore size", "Adding more air cavities"], answer: "b" },
+    { question: "How do panel absorbers convert sound energy?", options: ["Into heat energy through friction in pores", "Into mechanical energy through vibration", "Into electrical energy through resonance", "Into kinetic energy through air displacement"], answer: "b" },
+    { question: "What increases the absorption coefficient of a panel absorber?", options: ["Reducing the air cavity behind the panel", "Placing a porous absorber in the air cavity", "Increasing the panel's thickness", "Removing the air cavity entirely"], answer: "b" },
+    { question: "How do volume absorbers, like a Helmholtz resonator, reduce sound energy?", options: ["By reflecting sound waves outward", "By converting sound energy into heat through air vibration", "By amplifying the sound waves", "By blocking the sound completely"], answer: "b" },
+    { question: "What dual characteristics do acoustic ceilings exhibit?", options: ["Porous and volume absorber properties", "Panel and volume absorber properties", "Porous and panel absorber properties", "Reflective and porous absorber properties"], answer: "c" },
+    { question: "What is a common source of outdoor noise in a residential building?", options: ["Operation of a cistern", "Aeroplanes flying overhead", "Footsteps of occupants", "Playing of a television"], answer: "b" },
+    { question: "What is a recommended site planning strategy for reducing noise in residential areas?", options: ["Place roads close to dwellings to reduce travel distance", "Surround dwellings with hard surfacing to reflect noise", "Site the building in a quiet area away from noisy sources", "Place play areas for children near old people's dwellings"], answer: "c" },
+    { question: "How far should bedroom windows in a residential flat be from a noisy road with 80-90 dB(A) noise levels for better noise reduction?", options: ["At least 15 m", "At least 30 m", "At least 10 m", "At least 5 m"], answer: "b" },
+    { question: "What is a recommended internal planning strategy for noise control in a residential building?", options: ["Place bedrooms on the noisy side of the building", "Locate non-critical areas like kitchens on the noisy side", "Position refuse chutes next to bedrooms", "Place water-closets above living rooms"], answer: "b" },
+    { question: "What is a source of indoor noise in an educational building?", options: ["Traffic from nearby roads", "Movement of chairs and desks", "Noise from aeroplanes", "Industrial activities nearby"], answer: "b" },
+    { question: "What is a site planning recommendation for an educational building to reduce noise?", options: ["Place playgrounds close to classrooms", "Site the building as far as possible from external noise sources", "Increase glazing on the noisy side", "Position music rooms near quiet areas"], answer: "b" },
+    { question: "What is the maximum reverberation time for an empty classroom in an educational building for noise control?", options: ["1.0 s", "1.25 s", "1.5 s", "2.0 s"], answer: "b" },
+    { question: "What is the recommended reverberation time for an empty classroom in a school for the deaf?", options: ["1.0 s", "0.75 s", "0.5 s", "1.25 s"], answer: "c" },
+    { question: "What is a source of outdoor noise within a hospital's control?", options: ["Traffic noise from nearby roads", "Noise from ambulances and service vehicles", "Industrial noise from nearby factories", "Aeroplane noise from overhead flights"], answer: "b" },
+    { question: "What is a noise control recommendation for hospital wards?", options: ["Use hard-surfaced materials to reflect sound", "Add bed curtains to reduce reverberation", "Place sensitive areas near outdoor noise sources", "Use metal wheels on trolleys for mobility"], answer: "b" },
+    { question: "What is a recommended noise control measure for hospital operating theatres?", options: ["Use a single door for entry", "Provide two doors separated by an air gap", "Increase the use of hard surfaces", "Position them near noisy areas"], answer: "b" },
+    { question: "How is noise defined in the context of acoustics?", options: ["Any sound that is pleasant to hear", "Unwanted or undesirable sound", "Sound that is always loud", "Sound that enhances communication"], answer: "b" },
+    { question: "What decibel level can cause permanent hearing loss with long-term exposure?", options: ["Over 60 dB", "Over 80 dB", "Over 100 dB", "Over 120 dB"], answer: "b" },
+    { question: "What type of acoustic trauma is caused by a single, intense blast of sound?", options: ["Chronic acoustic trauma", "Acute acoustic trauma", "Reverberant trauma", "Mechanical trauma"], answer: "b" },
+    { question: "Which activity is likely to cause chronic acoustic trauma?", options: ["A single gunshot near the ear", "Prolonged use of headphones at high volume", "Attending a one-time loud concert", "A single explosion nearby"], answer: "b" },
+    { question: "How do sound waves propagate through a medium?", options: ["By mass movement of the medium", "By elastic vibration of particles about their mean positions", "By rotating the medium around a fixed axis", "By compressing the medium into a solid state"], answer: "b" },
+    { question: "What type of wave is sound propagation in a medium?", options: ["Transverse wave", "Longitudinal wave", "Electromagnetic wave", "Stationary wave"], answer: "b" },
+    { question: "What causes reverberation in an enclosed space?", options: ["Absorption of sound waves by soft surfaces", "Multiple reflections of sound waves from hard surfaces", "Transmission of sound waves through walls", "Conversion of sound waves into heat energy"], answer: "b" },
+    { question: "What can help decrease reverberation effects in an enclosed space?", options: ["Adding more hard surfaces", "Using sound-absorbing materials like carpets", "Increasing the room's volume", "Removing all furniture"], answer: "b" },
+    { question: "What does the absorption coefficient of a material indicate?", options: ["The proportion of sound reflected by the surface", "The proportion of sound absorbed by the surface", "The frequency of the sound wave", "The intensity of the sound wave"], answer: "b" },
+    { question: "What is the absorption coefficient of a fully open window?", options: ["0", "0.5", "1", "0.1"], answer: "c" },
+    { question: "What is the approximate absorption coefficient range for acoustic tiles?", options: ["0.01-0.02", "0.04-0.07", "0.4-0.8", "0.02-0.05"], answer: "c" },
+    { question: "Which material has the lowest absorption coefficient according to the slides?", options: ["Acoustic tiles", "Painted brickwork", "Unpainted brickwork", "Gypsum board"], answer: "b" },
+    { question: "What does the Darcy-Weisbach formula calculate in fluid mechanics?", options: ["The velocity of the fluid", "The head loss due to friction", "The pressure wave velocity", "The density of the fluid"], answer: "b" },
+    { question: "What is the significance of the Chezy's constant in Chezy's formula?", options: ["It determines the pipe's diameter", "It accounts for the roughness of the pipe", "It measures the fluid's density", "It calculates the fluid's pressure"], answer: "b" },
+    { question: "What type of fluid flow involves particles rotating about their own axis while flowing?", options: ["Irrotational flow", "Laminar flow", "Rotational flow", "Turbulent flow"], answer: "c" },
+    { question: "What is a key difference between steady and unsteady flow?", options: ["Steady flow changes with respect to space, while unsteady flow does not", "Steady flow does not change with time, while unsteady flow does", "Steady flow is always turbulent, while unsteady flow is laminar", "Steady flow occurs in gases, while unsteady flow occurs in liquids"], answer: "b" },
+    { question: "What does the variable 'g' represent in the Darcy-Weisbach formula?", options: ["Coefficient of friction", "Diameter of the pipe", "Acceleration due to gravity", "Length of the pipe"], answer: "c" },
+    { question: "What is the primary function of a contractor's pump in unwatering cofferdams?", options: ["To increase the water level inside the cofferdam", "To remove water from the cofferdam", "To seal the cofferdam permanently", "To heat the water inside the cofferdam"], answer: "b" },
+    { question: "What should be considered when selecting the inlet size of a contractor's pump?", options: ["A larger inlet size allows for faster water pumping", "A smaller inlet size increases the flow rate", "The inlet size does not affect the pump's performance", "A larger inlet size reduces the pump's efficiency"], answer: "a" },
+    { question: "What type of contractor's pump is specifically mentioned for dewatering purposes?", options: ["Centrifugal pump", "Submersible dewatering pump", "Diaphragm pump", "Reciprocating pump"], answer: "b" },
+    { question: "What happens during the expulsion stroke of a diaphragm pump?", options: ["The diaphragm extends to suck in water", "The diaphragm collapses to discharge water", "The intake valve opens to release water", "The discharge valve closes to create a vacuum"], answer: "b" },
+    { question: "What is a key advantage of reciprocating pumps in terms of flexibility?", options: ["They can handle liquids with solids in suspension", "They operate at nearly constant efficiency over a wide range of flow rates", "They are simpler and cheaper than centrifugal pumps", "They can be directly connected to a motor without gears"], answer: "b" },
+    { question: "What is a key feature of centrifugal pumps that makes them suitable for handling solids in suspension?", options: ["Their ability to create a partial vacuum", "Their design to deliver liquid without pulsations", "Their high flexibility in operation", "Their ability to operate at constant efficiency"], answer: "b" },
+    { question: "What is the primary mechanism by which porous absorbers convert sound energy?", options: ["By reflecting sound waves", "By converting sound energy into heat through friction", "By amplifying sound waves", "By transmitting sound waves through the material"], answer: "b" },
+    { question: "What is the role of the air cavity in a panel absorber?", options: ["It reflects sound waves back into the room", "It acts like a spring, absorbing energy by damping vibrations", "It increases the reverberation time", "It prevents sound waves from entering the panel"], answer: "b" },
+    { question: "What is a recommended internal planning strategy for educational buildings to reduce noise?", options: ["Group noisy rooms with quiet ones", "Use swing doors in all rooms", "Fit rubber buffers to the legs of chairs and tables", "Increase glazing on the noisy side"], answer: "c" },
+    { question: "What is the recommended reverberation time for a full assembly hall for acoustic reasons?", options: ["0.75-1.25 s", "1.0-1.25 s", "1.5-2.5 s", "0.5-1.0 s"], answer: "b" },
+    { question: "What is a source of indoor noise in a hospital setting?", options: ["Noise from aeroplanes", "Footsteps and wheeled trolleys", "Traffic noise from outside", "Industrial noise from nearby factories"], answer: "b" },
+    { question: "What is a recommended noise control measure for hospital equipment like trolleys?", options: ["Use metal wheels for durability", "Use rubber-tyred wheels to reduce noise", "Increase the speed of the trolleys", "Remove wheels to prevent movement"], answer: "b" },
+    { question: "What is the absorption coefficient of a thick, smooth painted concrete ceiling?", options: ["Close to 0", "Close to 0.5", "Close to 1", "Close to 0.8"], answer: "a" },
+    { question: "What type of fluid flow is also known as streamline or viscous flow?", options: ["Turbulent flow", "Laminar flow", "Rotational flow", "Compressible flow"], answer: "b" },
+    { question: "What is the primary cause of energy loss in a short pipe compared to a long pipe?", options: ["Friction losses dominate in short pipes", "Minor losses are comparable to friction losses in short pipes", "Minor losses are negligible in short pipes", "Friction losses are negligible in short pipes"], answer: "b" },
+    { question: "What is the velocity of water flow in a pipe with a diameter of 0.6 m and a discharge of 0.3 m³/s?", options: ["0.53 m/s", "1.06 m/s", "2.12 m/s", "0.27 m/s"], answer: "b" },
+    { question: "What is the head loss in a 0.6 m diameter pipe, 1.5 m long, with a velocity of 1.06 m/s, f=0.017, and g=9.81 m/s²?", options: ["0.1959 m", "1.665 m", "0.0333 m", "0.0024 m"], answer: "d" },
+    { question: "What is a key consideration when purchasing a contractor's pump for a specific type of water?", options: ["The pump should always be centrifugal for all water types", "The pump type should match the water, e.g., centrifugal for sewage", "The pump should only handle clean water", "The type of water does not affect pump selection"], answer: "b" },
+    { question: "What is the role of the casing in a centrifugal pump?", options: ["It reduces the velocity of the liquid", "It converts kinetic energy into pressure energy", "It creates a partial vacuum at the eye", "It seals the suction pipe"], answer: "b" },
+    { question: "What is a key difference between acute and chronic acoustic trauma?", options: ["Acute trauma is caused by prolonged exposure, while chronic trauma is caused by a single event", "Acute trauma resolves spontaneously, while chronic trauma leads to progressive hearing loss", "Acute trauma leads to permanent damage, while chronic trauma is reversible", "Acute trauma occurs in quiet environments, while chronic trauma occurs in loud environments"], answer: "b" },
+    { question: "What is the absorption coefficient of unpainted brickwork?", options: ["0.01-0.02", "0.02-0.05", "0.04-0.07", "0.4-0.8"], answer: "b" },
+    { question: "What is a recommended layout plan for noise control in a semi-detached house?", options: ["Place the kitchen on the opposite side of the party wall", "Position the staircase and kitchen on each side of the party wall", "Locate bedrooms next to the party wall", "Place the living room adjacent to the party wall"], answer: "b" },
+    { question: "What is the maximum reverberation time for an empty gymnasium in an educational building?", options: ["1.0 s", "1.25 s", "1.5 s", "2.0 s"], answer: "c" },
+    { question: "What is a recommended noise control measure for a hospital's lift gates?", options: ["Use metal gates for durability", "Fit buffers and silent closing gear", "Increase the speed of the gates", "Remove the gates to reduce noise"], answer: "b" },
+    { question: "What type of flow occurs in slow-moving streams, as mentioned in the slides?", options: ["Turbulent flow", "Laminar flow", "Rotational flow", "Compressible flow"], answer: "b" },
+    { question: "What type of flow is exemplified by ocean waves?", options: ["Laminar flow", "Steady flow", "Turbulent flow", "Uniform flow"], answer: "c" },
+    { question: "What is the purpose of planning against noise in acoustics?", options: ["To increase noise levels in buildings", "To cover guidelines for acceptable noise levels and sound insulation", "To amplify sound in enclosed spaces", "To eliminate all sound in buildings"], answer: "b" },
+    { question: "What is the absorption coefficient of gypsum board, 12 mm thick?", options: ["0.01-0.02", "0.02-0.05", "0.04-0.07", "0.4-0.8"], answer: "c" },
+    { question: "What is a key feature of sound propagation in a medium?", options: ["The medium moves as a whole with the sound wave", "The particles oscillate about their mean positions", "The medium rotates around a fixed axis", "The medium compresses into a solid state"], answer: "b" }
+];
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let time = 0;
+        let timerInterval;
+
+        const quizContainer = document.getElementById("quiz");
+        const prevButton = document.getElementById("prev");
+        const nextButton = document.getElementById("next");
+        const submitButton = document.getElementById("submit");
+        const resultDiv = document.getElementById("result");
+        const progress = document.querySelector(".progress");
+        const timeDisplay = document.getElementById("time");
+
+        // Airtable Configuration
+        const airtableBaseId = "appBA8BDAjCnEwbEb"; // Replace with your Airtable Base ID (e.g., "appXXXXXXXXXXXXXX")
+        const airtableTableName = "Quiz table";
+        const airtablePAT = "patcwZljMJW2c5hsB.4de15ac60a7791f322ba80c5a5fbb9135ac8c2663765c5e7073419f724eb31fe"; // Replace with your PAT (e.g., "patXXXXXXXXXXXXXX")
+
+        // Start Timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                time++;
+                let minutes = Math.floor(time / 60);
+                let seconds = time % 60;
+                timeDisplay.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+            }, 1000);
+        }
+
+        // Load Question
+        function loadQuestion() {
+            const q = quizData[currentQuestion];
+            quizContainer.innerHTML = `
+                <div class="question">${currentQuestion + 1}. ${q.question}</div>
+                <div class="options">
+                    ${q.options.map((option, index) => `
+                        <label>
+                            <input type="radio" name="q${currentQuestion}" value="${String.fromCharCode(97 + index)}" ${userAnswers[currentQuestion] === String.fromCharCode(97 + index) ? "checked" : ""}>
+                            ${option}
+                        </label>
+                    `).join("")}
+                </div>
+            `;
+            updateProgress();
+            prevButton.disabled = currentQuestion === 0;
+            nextButton.disabled = currentQuestion === quizData.length - 1;
+        }
+
+        // Update Progress Bar
+        function updateProgress() {
+            const percentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progress.style.width = `${percentage}%`;
+        }
+
+        // Save Answer
+        function saveAnswer() {
+            const selected = document.querySelector(`input[name="q${currentQuestion}"]:checked`);
+            userAnswers[currentQuestion] = selected ? selected.value : null;
+        }
+
+        // Show Result with Improved Review
+        function showResult() {
+            clearInterval(timerInterval);
+            score = 0;
+            quizData.forEach((q, index) => {
+                if (userAnswers[index] === q.answer) score++;
+            });
+            quizContainer.innerHTML = "";
+            resultDiv.innerHTML = `
+                <div class="result-header">
+                    You scored ${score} out of ${quizData.length} (${Math.round((score / quizData.length) * 100)}%) in ${timeDisplay.textContent}
+                </div>
+                <table class="review-table">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Your Answer</th>
+                            <th>Correct Answer</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${quizData.map((q, i) => `
+                            <tr>
+                                <td>${i + 1}. ${q.question}</td>
+                                <td>${userAnswers[i] ? q.options[userAnswers[i].charCodeAt(0) - 97] : "Not answered"}</td>
+                                <td>${q.options[q.answer.charCodeAt(0) - 97]}</td>
+                                <td class="${userAnswers[i] === q.answer ? 'correct' : 'incorrect'}">
+                                    ${userAnswers[i] === q.answer ? "Correct" : "Incorrect"}
+                                </td>
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            `;
+            saveToServer();
+            prevButton.style.display = "none";
+            nextButton.style.display = "none";
+            submitButton.style.display = "none";
+        }
+
+        // Save Results to Airtable
+        function saveToServer() {
+            const data = {
+                fields: {
+                    UserID: "user123", // Replace with dynamic user ID logic if available
+                    QuizName: "African Studies Quiz",
+                    Score: score,
+                    Total: quizData.length,
+                    Time: time,
+                    Answers: JSON.stringify(userAnswers),
+                    Date: new Date().toISOString()
+                }
+            };
+
+            fetch(`https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${airtablePAT}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then(() => {
+                resultDiv.innerHTML += "<br><span class='correct'>Results saved successfully to Airtable!</span>";
+                console.log("Data saved to Airtable:", data);
+            })
+            .catch(error => {
+                resultDiv.innerHTML += "<br><span class='incorrect'>Error saving results to Airtable: " + error.message + "</span>";
+                console.error("Error saving to Airtable:", error);
+            });
+        }
+
+        // Event Listeners
+        prevButton.addEventListener("click", () => {
+            saveAnswer();
+            currentQuestion--;
+            loadQuestion();
+        });
+
+        nextButton.addEventListener("click", () => {
+            saveAnswer();
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            }
+        });
+
+        submitButton.addEventListener("click", () => {
+            saveAnswer();
+            showResult();
+        });
+
+        // Initialize Quiz
+        startTimer();
+        loadQuestion();
+    </script>
+</body>
+</html>
